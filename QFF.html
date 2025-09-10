@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Financial Firewall (QFF) - Live Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #2d1b69 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #00ff88, #00ccff, #ff00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            color: #cccccc;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .card h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .transaction-input {
+            grid-column: span 2;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .input-group input, .input-group select {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .input-group input::placeholder {
+            color: #cccccc;
+        }
+        
+        .scan-btn {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .scan-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,255,136,0.4);
+        }
+        
+        .simulation-container {
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .parallel-universes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .universe {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .universe.safe {
+            border-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+        
+        .universe.danger {
+            border-color: #ff4444;
+            background: rgba(255,68,68,0.1);
+        }
+        
+        .universe.warning {
+            border-color: #ffaa00;
+            background: rgba(255,170,0,0.1);
+        }
+        
+        .risk-score {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .safe { color: #00ff88; }
+        .warning { color: #ffaa00; }
+        .danger { color: #ff4444; }
+        
+        .agent-battle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .agent {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .agent-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .vs {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffaa00;
+            margin: 0 20px;
+        }
+        
+        .decision-panel {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .decision-panel.approved {
+            border-left: 5px solid #00ff88;
+        }
+        
+        .decision-panel.blocked {
+            border-left: 5px solid #ff4444;
+        }
+        
+        .decision-panel.modified {
+            border-left: 5px solid #ffaa00;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .quantum-status {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        
+        .quantum-meter {
+            background: rgba(0,0,0,0.3);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .quantum-meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #ffaa00, #ff4444);
+            transition: width 2s ease;
+        }
+        
+        .logs {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .log-info { background: rgba(0,255,136,0.1); }
+        .log-warning { background: rgba(255,170,0,0.1); }
+        .log-error { background: rgba(255,68,68,0.1); }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .stat-card {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡️ Quantum Financial Firewall</h1>
+        <p>AI-Powered Financial Security with Parallel Universe Simulation</p>
+    </div>
+
+    <div class="dashboard">
+        <!-- Transaction Input -->
+        <div class="card transaction-input">
+            <h3>💸 New Transaction Scanner</h3>
+            <div class="input-group">
+                <input type="text" id="fromAccount" placeholder="From Account (e.g., John Doe - ****1234)" value="John Doe - ****1234">
+                <input type="text" id="toAccount" placeholder="To Account/Wallet" value="">
+                <input type="number" id="amount" placeholder="Amount ($)" value="">
+                <select id="transactionType">
+                    <option value="bank">Bank Transfer</option>
+                    <option value="crypto">Crypto Transfer</option>
+                    <option value="payment">Online Payment</option>
+                </select>
+            </div>
+            <button class="scan-btn" onclick="startQFFScan()">🔍 Scan with QFF AI Agents</button>
+        </div>
+
+        <!-- Parallel Universe Simulation -->
+        <div class="card simulation-container" id="simulationResults">
+            <h3>🌌 Parallel Universe Analysis</h3>
+            <div class="parallel-universes" id="universeGrid">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="chart-container">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+
+        <!-- AI Agent Battle -->
+        <div class="card simulation-container" id="agentBattle">
+            <h3>🤖 AI Agent Simulation</h3>
+            <div class="agent-battle">
+                <div class="agent">
+                    <div class="agent-icon">🛡️</div>
+                    <h4>Defender Agent</h4>
+                    <p id="defenderStatus">Analyzing...</p>
+                </div>
+                <div class="vs">⚔️</div>
+                <div class="agent">
+                    <div class="agent-icon">💀</div>
+                    <h4>Attacker Agent</h4>
+                    <p id="attackerStatus">Simulating attacks...</p>
+                </div>
+            </div>
+            <div class="decision-panel" id="decisionPanel">
+                <h4>🧠 QFF Decision Engine</h4>
+                <p id="decisionText">Processing parallel simulations...</p>
+            </div>
+        </div>
+
+        <!-- Quantum Security -->
+        <div class="card simulation-container" id="quantumSecurity">
+            <h3>⚛️ Quantum Security Analysis</h3>
+            <div class="quantum-status">
+                <span>Quantum Threat Level:</span>
+                <div class="quantum-meter">
+                    <div class="quantum-meter-fill" id="quantumMeter"></div>
+                </div>
+                <span id="quantumLevel">Safe</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value safe" id="encryptionStrength">256-bit</div>
+                    <div class="stat-label">Encryption</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="quantumResistance">✅</div>
+                    <div class="stat-label">Quantum Ready</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="universeCount">0</div>
+                    <div class="stat-label">Universes Sim.</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="threatsPrevented">0</div>
+                    <div class="stat-label">Threats Blocked</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Logs -->
+        <div class="card simulation-container" id="systemLogs">
+            <h3>📊 Real-time System Logs</h3>
+            <div class="logs" id="logContainer">
+                <div class="log-entry log-info">[SYSTEM] QFF Initialized - Ready for transaction analysis</div>
+                <div class="log-entry log-info">[AI] Defender and Attacker agents loaded successfully</div>
+                <div class="log-entry log-info">[QUANTUM] Post-quantum cryptography modules active</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let riskChart;
+        let simulationCount = 0;
+
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function generateRandomScenarios() {
+            const scenarios = [
+                { name: "Normal Transfer", risk: Math.random() * 20, type: "safe" },
+                { name: "Phishing Attempt", risk: 75 + Math.random() * 25, type: "danger" },
+                { name: "Unusual Pattern", risk: 40 + Math.random() * 30, type: "warning" },
+                { name: "Money Laundering", risk: 80 + Math.random() * 20, type: "danger" },
+                { name: "Legitimate Business", risk: Math.random() * 15, type: "safe" },
+                { name: "Crypto Mixer", risk: 60 + Math.random() * 30, type: "danger" },
+                { name: "Cross-border Transfer", risk: 25 + Math.random() * 25, type: "warning" },
+                { name: "Micropayment", risk: Math.random() * 10, type: "safe" },
+                { name: "High-velocity Trading", risk: 35 + Math.random() * 25, type: "warning" }
+            ];
+            
+            return scenarios.sort(() => 0.5 - Math.random()).slice(0, 6);
+        }
+
+        function startQFFScan() {
+            const amount = document.getElementById('amount').value;
+            const toAccount = document.getElementById('toAccount').value;
+            const transactionType = document.getElementById('transactionType').value;
+
+            if (!amount || !toAccount) {
+                alert('Please enter transaction amount and destination account');
+                return;
+            }
+
+            // Show simulation containers
+            document.querySelectorAll('.simulation-container').forEach(el => {
+                el.style.display = 'block';
+            });
+
+            addLog(`🔍 Starting QFF scan for $${amount} ${transactionType} transfer`, 'info');
+            addLog(`🌌 Initializing parallel universe simulation...`, 'info');
+
+            // Generate parallel universes
+            const scenarios = generateRandomScenarios();
+            const universeGrid = document.getElementById('universeGrid');
+            universeGrid.innerHTML = '';
+
+            let totalRisk = 0;
+            const riskData = [];
+            const labels = [];
+
+            scenarios.forEach((scenario, index) => {
+                const universe = document.createElement('div');
+                universe.className = `universe ${scenario.type}`;
+                universe.innerHTML = `
+                    <h5>Universe ${index + 1}</h5>
+                    <p>${scenario.name}</p>
+                    <div class="risk-score ${scenario.type}">${Math.round(scenario.risk)}%</div>
+                `;
+                universeGrid.appendChild(universe);
+                
+                totalRisk += scenario.risk;
+                riskData.push(scenario.risk);
+                labels.push(`U${index + 1}`);
+            });
+
+            const avgRisk = totalRisk / scenarios.length;
+
+            // Update chart
+            if (riskChart) riskChart.destroy();
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            riskChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Risk Level (%)',
+                        data: riskData,
+                        backgroundColor: riskData.map(risk => 
+                            risk < 30 ? 'rgba(0, 255, 136, 0.7)' : 
+                            risk < 60 ? 'rgba(255, 170, 0, 0.7)' : 
+                            'rgba(255, 68, 68, 0.7)'
+                        ),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: 'white' } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: 'white' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'white' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // AI Agent Battle
+            addLog(`🤖 Activating competing AI agents...`, 'info');
+            setTimeout(() => {
+                document.getElementById('defenderStatus').innerHTML = '🔍 Found 3 protection paths';
+                document.getElementById('attackerStatus').innerHTML = '💀 Discovered 2 attack vectors';
+                addLog(`🛡️ Defender Agent: Identified secure routing options`, 'info');
+                addLog(`💀 Attacker Agent: Simulated social engineering attack`, 'warning');
+            }, 1000);
+
+            // Decision making
+            setTimeout(() => {
+                const decisionPanel = document.getElementById('decisionPanel');
+                let decision, decisionClass, decisionText;
+
+                if (avgRisk < 25) {
+                    decision = '✅ APPROVED';
+                    decisionClass = 'approved';
+                    decisionText = `Transaction approved. Low risk detected across ${scenarios.length} parallel universes (Avg: ${Math.round(avgRisk)}%)`;
+                    addLog(`✅ APPROVED: Transaction cleared by QFF`, 'info');
+                } else if (avgRisk < 60) {
+                    decision = '⚠️ MODIFIED';
+                    decisionClass = 'modified';
+                    decisionText = `Transaction modified for safety. Breaking into smaller chunks and adding 24h escrow period. Risk: ${Math.round(avgRisk)}%`;
+                    addLog(`⚠️ MODIFIED: Transaction restructured for safety`, 'warning');
+                } else {
+                    decision = '🚫 BLOCKED';
+                    decisionClass = 'blocked';
+                    decisionText = `Transaction BLOCKED. High fraud probability detected: ${Math.round(avgRisk)}%. Recommend manual review.`;
+                    addLog(`🚫 BLOCKED: High-risk transaction prevented`, 'error');
+                }
+
+                decisionPanel.className = `decision-panel ${decisionClass}`;
+                decisionPanel.innerHTML = `
+                    <h4>🧠 QFF Decision: ${decision}</h4>
+                    <p>${decisionText}</p>
+                `;
+            }, 2000);
+
+            // Quantum analysis
+            setTimeout(() => {
+                const quantumThreat = Math.random() * 100;
+                const quantumMeter = document.getElementById('quantumMeter');
+                const quantumLevel = document.getElementById('quantumLevel');
+                
+                quantumMeter.style.width = quantumThreat + '%';
+                
+                if (quantumThreat < 30) {
+                    quantumLevel.innerHTML = 'Safe';
+                    quantumLevel.className = 'safe';
+                    document.getElementById('quantumResistance').innerHTML = '✅';
+                } else if (quantumThreat < 70) {
+                    quantumLevel.innerHTML = 'Moderate';
+                    quantumLevel.className = 'warning';
+                    document.getElementById('quantumResistance').innerHTML = '⚠️';
+                } else {
+                    quantumLevel.innerHTML = 'High Risk';
+                    quantumLevel.className = 'danger';
+                    document.getElementById('quantumResistance').innerHTML = '❌';
+                }
+
+                addLog(`⚛️ Quantum threat assessment: ${Math.round(quantumThreat)}%`, 'info');
+            }, 1500);
+
+            // Update stats
+            simulationCount++;
+            document.getElementById('universeCount').innerHTML = scenarios.length;
+            document.getElementById('threatsPrevented').innerHTML = simulationCount;
+
+            addLog(`📊 Simulation complete. Analyzed ${scenarios.length} parallel outcomes`, 'info');
+        }
+
+        // Demo data generator
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                const demoTransactions = [
+                    'Blocked suspicious transfer to known phishing wallet',
+                    'Approved micropayment to verified merchant',
+                    'Modified high-risk crypto swap - added escrow',
+                    'Quantum encryption check: All systems secure'
+                ];
+                addLog(demoTransactions[Math.floor(Math.random() * demoTransactions.length)], 'info');
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

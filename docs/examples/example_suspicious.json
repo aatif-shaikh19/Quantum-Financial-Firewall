@@ -1,0 +1,14 @@
+{
+    "score": 60,
+    "riskLevel": "HIGH",
+    "factors": [
+        "High-value transaction",
+        "Irreversible chain transaction"
+    ],
+    "recommendation": "FLAG",
+    "narrative": "Analyzed CRYPTO_TRANSFER -> receiver 0xabcdef1234567890abcdef",
+    "explainability": {
+        "amount": 15.0,
+        "type": 20.0
+    }
+}

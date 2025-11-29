@@ -1,0 +1,48 @@
+QFF Judge Demo Report
+=====================
+
+--- Scenario: Safe Transaction ---
+Transaction: {"amount": 500, "currency": "USD", "type": "PAYMENT", "receiver": "user-safe"}
+1. Analyzing...
+   Score: None (None)
+   Recommendation: None
+   Factors: None
+2. Establishing Quantum Key (Intercept Prob: 0.0)...
+   Status: None
+3. Executing...
+   Result: {'error': "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /execute (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020A40EE3D90>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"}
+
+--- Scenario: Suspicious High Value ---
+Transaction: {"amount": 50000, "currency": "USD", "type": "CRYPTO_TRANSFER", "receiver": "unknown-wallet"}
+1. Analyzing...
+   Score: None (None)
+   Recommendation: None
+   Factors: None
+2. Establishing Quantum Key (Intercept Prob: 0.0)...
+   Status: None
+3. Executing...
+   Result: {'error': "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /execute (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020A40F8D5B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"}
+
+--- Scenario: Malicious Receiver ---
+Transaction: {"amount": 100, "currency": "USD", "type": "PAYMENT", "receiver": "0xdeadbeef"}
+1. Analyzing...
+   Score: None (None)
+   Recommendation: None
+   Factors: None
+2. Establishing Quantum Key (Intercept Prob: 0.0)...
+   Status: None
+3. Executing...
+   Result: {'error': "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /execute (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020A40F96470>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"}
+
+--- Scenario: QKD Interception Attempt ---
+Transaction: {"amount": 1000, "currency": "USD", "type": "PAYMENT", "receiver": "user-target"}
+1. Analyzing...
+   Score: None (None)
+   Recommendation: None
+   Factors: None
+2. Establishing Quantum Key (Intercept Prob: 1.0)...
+   Status: None
+3. Executing...
+   Result: {'error': "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /execute (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020A40F96BE0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))"}
+
+--- End of Demo ---

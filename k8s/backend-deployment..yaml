@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: qff-backend }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: qff-backend } }
+  template:
+    metadata: { labels: { app: qff-backend } }
+    spec:
+      containers:
+      - name: backend
+        image: qff-backend:latest
+        ports: [{ containerPort: 8000 }]

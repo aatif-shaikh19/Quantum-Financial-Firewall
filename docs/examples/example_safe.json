@@ -1,0 +1,8 @@
+{
+  "score": 95,
+  "riskLevel": "LOW",
+  "factors": [],
+  "recommendation": "PROCEED",
+  "narrative": "Analyzed PAYMENT -> receiver 0x1234567890abcdef123456",
+  "explainability": {}
+}

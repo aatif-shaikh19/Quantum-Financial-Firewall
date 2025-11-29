@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'qff-backend'
+    static_configs:
+      - targets: ['qff-backend:8000']

@@ -1,0 +1,38 @@
+[
+    {
+        "amount": 100,
+        "type": "PAYMENT",
+        "receiver": "user-safe",
+        "label": "SAFE"
+    },
+    {
+        "amount": 50,
+        "type": "UPI_PAYMENT",
+        "receiver": "merchant-1",
+        "label": "SAFE"
+    },
+    {
+        "amount": 50000,
+        "type": "CRYPTO_TRANSFER",
+        "receiver": "unknown-wallet",
+        "label": "SUSPICIOUS"
+    },
+    {
+        "amount": 100,
+        "type": "PAYMENT",
+        "receiver": "0xdeadbeef",
+        "label": "MALICIOUS"
+    },
+    {
+        "amount": 20000,
+        "type": "FOREX_PAYMENT",
+        "receiver": "overseas-1",
+        "label": "SAFE"
+    },
+    {
+        "amount": 100000,
+        "type": "BANK_TRANSFER",
+        "receiver": "new-account",
+        "label": "SUSPICIOUS"
+    }
+]

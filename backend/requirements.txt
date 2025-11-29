@@ -1,0 +1,21 @@
+fastapi
+uvicorn[standard]
+pydantic[email]
+sqlalchemy
+databases
+alembic
+requests
+python-multipart
+httpx
+prometheus-client
+python-json-logger
+pytest
+numpy
+scikit-learn
+cryptography
+pyjwt
+passlib[bcrypt]
+bcrypt
+# liboqs-python is optional - system works without it in simulation mode
+# Uncomment if you want real post-quantum crypto (requires C++ libraries)
+# liboqs-python

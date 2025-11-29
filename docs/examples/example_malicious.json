@@ -1,0 +1,12 @@
+{
+    "score": 0,
+    "riskLevel": "CRITICAL",
+    "factors": [
+        "Receiver flagged"
+    ],
+    "recommendation": "BLOCK",
+    "narrative": "Analyzed PAYMENT -> receiver 0xdeadbeef1234567890abcdef",
+    "explainability": {
+        "receiver": 100.0
+    }
+}

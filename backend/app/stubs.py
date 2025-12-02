@@ -1,5 +1,5 @@
 import uuid
-from .db import engine, SessionLocal
+from .database import engine, SessionLocal
 from .models import users, accounts, ledger, init_db
 
 def seed_demo_data():

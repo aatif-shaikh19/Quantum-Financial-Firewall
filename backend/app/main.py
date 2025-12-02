@@ -451,3 +451,90 @@ def quantum_establish(intercept_prob: float = Query(0.0)):
     if result.get("status") == "INTERCEPTED":
         notify("SECURITY", "Quantum interception", "QKD interception detected", result)
     return result
+
+# ============ ENTERPRISE SECURITY CONSOLE ============
+
+@app.get("/security/status")
+def security_status(current_user: dict = Depends(require_admin)):
+    """Get comprehensive security status (admin only)"""
+    from .security_layer import security_layer
+    from .immutable_ledger import immutable_ledger
+    from .alerter import get_alert_stats
+    
+    return {
+        "encryption": security_layer.get_security_status(),
+        "ledger_integrity": immutable_ledger.verify_chain(100),
+        "quantum": get_quantum_info(),
+        "alerts": get_alert_stats(),
+        "status": "OPERATIONAL"
+    }
+
+@app.get("/security/alerts")
+def security_alerts(limit: int = 50, current_user: dict = Depends(require_admin)):
+    """Get recent security alerts (admin only)"""
+    from .alerter import get_alert_history
+    return {"alerts": get_alert_history(limit)}
+
+@app.get("/security/audit/{tx_id}")
+def security_audit(tx_id: str, current_user: dict = Depends(require_admin)):
+    """Get audit trail for a transaction (admin only)"""
+    from .immutable_ledger import immutable_ledger
+    trail = immutable_ledger.get_audit_trail(tx_id)
+    if not trail:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return trail
+
+@app.post("/security/verify-chain")
+def verify_chain(current_user: dict = Depends(require_admin)):
+    """Verify ledger integrity (admin only)"""
+    from .immutable_ledger import immutable_ledger
+    return immutable_ledger.verify_chain()
+
+@app.get("/security/encryption-status")
+def encryption_status(current_user: dict = Depends(require_admin)):
+    """Get encryption layer status (admin only)"""
+    from .security_layer import security_layer
+    return security_layer.get_security_status()
+
+# ============ TRANSACTION TYPES INFO ============
+
+@app.get("/transaction-types")
+def get_transaction_types():
+    """Get all supported transaction types"""
+    return {
+        "types": [
+            {"code": "BANK_TRANSFER", "name": "Bank Transfer", "rail": "BANK_RAIL", "reversible": True},
+            {"code": "UPI_PAYMENT", "name": "UPI Payment", "rail": "UPI", "reversible": True},
+            {"code": "CARD_PAYMENT", "name": "Card Payment", "rail": "CARD", "reversible": True},
+            {"code": "CRYPTO_TRANSFER", "name": "Crypto Transfer", "rail": "BLOCKCHAIN", "reversible": False},
+            {"code": "SMART_CONTRACT", "name": "Smart Contract", "rail": "SMART_CONTRACT", "reversible": False},
+            {"code": "FOREX_PAYMENT", "name": "Forex Payment", "rail": "FOREX", "reversible": True},
+            {"code": "WIRE_TRANSFER", "name": "Wire Transfer", "rail": "WIRE", "reversible": True},
+            {"code": "ACH_TRANSFER", "name": "ACH Transfer", "rail": "ACH", "reversible": True},
+            {"code": "SEPA_TRANSFER", "name": "SEPA Transfer", "rail": "SEPA", "reversible": True},
+            {"code": "SWIFT_PAYMENT", "name": "SWIFT Payment", "rail": "SWIFT", "reversible": True}
+        ],
+        "currencies": [
+            {"code": "USD", "name": "US Dollar", "type": "fiat"},
+            {"code": "EUR", "name": "Euro", "type": "fiat"},
+            {"code": "GBP", "name": "British Pound", "type": "fiat"},
+            {"code": "INR", "name": "Indian Rupee", "type": "fiat"},
+            {"code": "JPY", "name": "Japanese Yen", "type": "fiat"},
+            {"code": "SAR", "name": "Saudi Riyal", "type": "fiat"},
+            {"code": "AED", "name": "UAE Dirham", "type": "fiat"},
+            {"code": "BTC", "name": "Bitcoin", "type": "crypto"},
+            {"code": "ETH", "name": "Ethereum", "type": "crypto"},
+            {"code": "USDT", "name": "Tether", "type": "stablecoin"},
+            {"code": "USDC", "name": "USD Coin", "type": "stablecoin"}
+        ],
+        "rails": [
+            {"code": "BANK_RAIL", "name": "Traditional Banking", "quantum_protected": True},
+            {"code": "UPI", "name": "Unified Payments Interface", "quantum_protected": True},
+            {"code": "CARD", "name": "Card Networks", "quantum_protected": True},
+            {"code": "BLOCKCHAIN", "name": "Blockchain Network", "quantum_protected": True},
+            {"code": "SMART_CONTRACT", "name": "Smart Contract Execution", "quantum_protected": True},
+            {"code": "FOREX", "name": "Foreign Exchange", "quantum_protected": True},
+            {"code": "SWIFT", "name": "SWIFT Network", "quantum_protected": True},
+            {"code": "SEPA", "name": "SEPA Network", "quantum_protected": True}
+        ]
+    }
